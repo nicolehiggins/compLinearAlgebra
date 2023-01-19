@@ -1,0 +1,246 @@
+---
+title: "R debut"
+author: "Will Mitchell"
+date: "3/14/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+*You can remove this "download" link from your own documents*
+```{r results = 'asis', comment = NA,echo=FALSE}
+myrmd = base64enc::dataURI(file = "mynb.Rmd", mime = 'text/rmd')
+cat(sprintf("
+ <a href='%s' target='_blank' download='mynb.Rmd'>
+  <span class='glyphicon glyphicon-cloud-download' style='font-size:1.2em;'></span>   Download
+  </a>", myrmd
+))
+########  delete this code chunk to remove the Download link   ###############
+```
+
+
+
+
+## Welcome to R Markdown
+
+Ordinary typing looks like this.  
+You can write in *italic text* and **bold text.**   
+You can insert links: [A more detailed R Markdown guide](https://drive.google.com/file/d/1ROTF2sgLjGqFVgPh2k32wwoBr6sAzmsc/view).  
+You can also write inline math stuff using dollar signs, like $2+3x = \frac{17}{\pi}$.
+For more complicated equations you can use the double dollar sign. Here is a visually pretty but mathematically meaningless equation: 
+$$
+\sin\left(\frac{\pi}{2} + x^2\right) = \sum_{i=0}^{170}\frac{4y_i}{i!}
+$$
+All of the nice text you write in this way, including the math mode, is for display only. This is the "Markdown" part.  The "R" part is separate! To actually run some R code, you enclose it in triple quote marks. Here's an example where we write an R block to add up the first ten positive integers. The first line, starting with "a <- ", does the sum and stores it as the value of "a".  The "cat" command in the second line prints out the value. 
+
+
+```{r}
+a <- 1+2+3+4+5+6+7+8+9+10
+cat(a)
+```
+
+## My top ten tricks for new R users
+I am a new-ish R user myself (most of my own computational projects are in Python). I look forward to learning more along with you. Here's my current top ten list of things to know. If you're new to R, I suggest that you carefully read each line and make sure you understand where the results come from. 
+
+### 0: Install new packages
+Sometimes you'll get an error saying "this package is unknown" or something similar. 
+In that case, click on the **Packages** tab in the lower right subwindow. 
+Look for the package you want, for example "ggplot2". Check the box next to the name of the package. If you don't see it, click on *Install* 
+and follow the directions. In your R Markdown file, you should also put a line of code like this:
+```{r}
+library(ggplot2)
+```
+
+### 1: Use R as a calculator
+You can use R for basic arithmetic like this: 
+```{r}
+(1+(4-2)*2)^2 / 5
+```
+There's a lot more beyond arithmetic! Two other basic neat operations are the quotient and remainder. Seventeen divided by five is three with remainder two; compare these lines:
+```{r}
+print(17 / 5)
+print(17 %/%  5)
+print(17 %%  5)
+```
+Then there are many built-in calculus functions and constants. For example:
+```{r}
+print(sin(pi/2) + cos(pi/2))
+print(log10(100))
+print(log(100))
+print(exp(-10))
+```
+Please note in the previous lines that "log" is the logarithm with base e; if you want log base 10 you have to write "log10".  Also, to find e^x you type "exp(x)".  The last answer has a funny "e-05" which is scientific notation, that is, $\times 10^{-5}$.  
+
+### 2: Store variables
+In R there are two equivalent ways to assign variables. 
+The "<-" notation is supposed to look like an arrow. 
+The "=" notation (which is distinct from the double equals "==") is an alternative. 
+```{r}
+a <- 4
+b = -1 
+print(a^b) 
+```
+
+
+### 3: Write a function
+A basic function takes in a number and returns another number. Here's an example:
+```{r}
+myfun <- function(x){
+    a <- 3
+    b <- x+2 
+    c <- b^2 
+    return(a+b+c)
+}
+```
+That cell defines the function that takes in $x$ and returns $3 + (x+2) + (x+2)^2$.  That is, we've just defined a quadratic function. Now we can use it in other code fragments: 
+```{r}
+print(myfun(-2))
+d = myfun(10.5) - myfun(9.5)
+print(d)
+```
+More complicated functions types are possible. A function can even create and return another function. Careful function writing can make your code nice and clean and organized. 
+
+### 4: Make a vector using the colon operator
+I love this one. To make a list of all integers from 2 to 9, for example, we can just write: 
+```{r}
+v = 2:9
+print(v)
+print(sum(v))
+```
+Now the variable *v* is a vector (a list of numbers).  The built-in function *sum* takes in a vector and returns a number, specifically the sum of all vector entries. 
+
+### 5: Make a vector by specifying each entry
+Another way to make a vector is to type each entry individually. 
+The R method is like this: 
+```{r}
+w = c(2,-1,4,0,-10)
+print(w)
+print(sum(w))
+```
+
+### 6: Manipulate each entry in a vector all at once
+If you have a list of numbers and you want to do the same simple thing to each entry, R has really nice ways to do this! Here are some examples. Try to understand where every output number comes from. 
+```{r}
+a = 1:4
+b = c(2,5,5,-1)
+print(2*a^2) # a new vector containing two times the squares of each entry in "a"
+print(a*b)   # a new vector containing the products of the entries of "a" and "b"
+print(0*b-1) # a new vector of the same size as "b", with entries all equal to -1
+```
+These operations make clean code (we didn't write any for-loops) and they internally run very quickly, compared to a version where we write an explicit for-loop. 
+
+Suppose next that we want 100 equally spaced numbers starting from 2 and ending at 22. 
+One way to do this is:  
+
+* begin with the integers from 0 to 99 (that's 100 integers)
+* divide by 99 to get a list of numbers from 0 to 1
+* multiply by 20 to get a list of numbers from 0 to 20
+* add 2 to get a list of numbers from 2 to 22, just as we wanted. 
+ 
+```{r}
+v = (0:99) / 99 * 20 + 2
+print(v)
+```
+This could also be done quickly if you know the special command "seq".
+```{r}
+w = seq(from=2, to=22, length.out = 100)
+print(w)
+```
+Both ways are fine. I like the first one because I don't have to remember the syntax of the "seq" command, and I don't mind a little mental math for scaling and shifting the numbers. 
+But if I did this a lot, maybe the "seq" would feel more natural. 
+
+**Note on getting help in R**: Just now while writing this document, I could remember the name of the "seq" command but not how to use it. I typed "?seq" into the **Console** panel to see the help file for that command and that answered my question! Web searches can also be helpful for stuff like this. 
+
+### 7: Write a for-loop
+Here is a basic program to add up all of the squares of the numbers between 10 and 20: 
+```{r}
+vec = 10:20
+total = 0
+for (x in vec) {
+  total = total + x^2
+}
+print(total)
+```
+A much shorter way to do this is: 
+```{r}
+vec = 10:20
+print(sum(vec^2))
+```
+If you have lots of for-loops, especially for-loops inside of other for-loops, your code can run slowly. They are a tool that experienced R users employ sparingly. 
+However, I suggest using them whenever it's convenient for this class. 
+Here's another example that might be more difficult to rewrite without a loop. 
+We'll start with the number 10. Then we'll multiply by 2, then subtract 1, then multiply by 2, then subtract 1, and so on until we've subtracted 1 for the eighth time.  
+```{r}
+f = 10
+for (j in 1:8){
+  f = f*2 
+  f = f-1
+}
+print(f)
+```
+In this example we don't actually do anything with the index *j* as it increases from 1 to 8. 
+That's just a way to make the commands "f = f*2" and "f = f-1" run eight times. 
+Here's a more extensive discussion of loops: 
+[link](https://www.datacamp.com/community/tutorials/tutorial-on-loops-in-r). 
+
+
+### 8: Use if/then/else and True/False 
+The function "runif" produces random numbers between 0 and 1 (the name *runif* is a contraction of *random uniform*). 
+Here's a code block where: 
+
+* we generate ten random numbers between 0 and 1
+* we find the maximum among those numbers
+* if the max is above 0.9, we print "hooray"; otherwise "too bad"
+
+```{r}
+v = runif(10)
+M = max(v)
+print(M)
+if (M>0.9){ 
+  print("hooray")
+} else {
+  print("too bad")
+}
+```
+The statement "M>0.9" produces a Boolean variable (either "TRUE" or "FALSE").  You can get create Booleans in a few ways. Here are some examples: 
+```{r}
+a <- 1 
+b <- 3
+print(a == b)
+print(a <= b-2)
+print(-a > -b && 10*a > b)
+print(a > 50 || b > 0)
+```
+Note the difference between "a==b" and "a=b".  With double equals, you're testing whether or not these things are the same. With a single equals, you're copying the value of "b" into the variable "a". 
+
+The and "&&" and or "||" can be strung together into more complicated expressions; I suggest using lots of parentheses since (A && B) || C is different than A && (B || C). 
+
+### 9: Make a basic line plot
+
+Let's make a line plot illustrating the function $f(x) = 1 + 2\sin(2x) + 2\sin(4x)$, between 
+the bounds $x=0$ and $x = 2\pi$.  
+
+To do this, we start by making a vector of numbers varying from $0$ to $2\pi$. 
+These are the values of the horizontal coordinate. 
+```{r}
+x = 0:100 / 100 * 2 * pi
+```
+Next we'll build a vector of $y$-values corresponding to these $x$-values: 
+```{r}
+y = 1 + 2*sin(2*x) + 2*sin(4*x)
+```
+Finally we'll make a plot! You can just type "plot(x,y)", but you get a prettier result if you enable the "ggplot2" package and type the following: 
+```{r}
+qplot(x,y)
+```
+
+You can see in this figure that we used 101 points.  If you want them connected in a nice line, you can give another argument like this one: 
+```{r}
+qplot(x,y,geom="line")
+```
+
+In the preceding figure there are a few places where the graph has sharp corners. 
+It would be better if we had used about a thousand points instead of 101. 
+
