@@ -239,20 +239,20 @@ When you're done, save it in [this Google doc](https://docs.google.com/document/
 
 ```{r Setting Colors}
 
-nRed <- matrix(0,500,500) # a 500x500 grid of zeros for each color
-nGreen <- matrix(0,500,500)
-nBlue <- matrix(0,500,500)
+nRed <- matrix(1,500,500) # a 500x500 grid of zeros for each color
+nGreen <- matrix(1,500,500)
+nBlue <- matrix(1,500,500)
 
 # j in 1:110 or 390:500
 # j - i within 111
 
 for (i in 1:500){
   for (j in 1:500){
-    if ((55<j & j<111) | (389<j & j<445) | (abs(j - i) < 55)){
+    if ((44<j & j<111) | (389<j & j<455) | (abs(j - i) < 62)){
       nRed[i,j] <- 0.6
       nBlue[i,j] <- 0.9
       nGreen[i,j] <- 0.5
-      if (abs(j - i) < 22){
+      if (abs(j - i) < 27){
         nRed[i,j] <- 0.7
         nBlue[i,j] <- 1
         nGreen[i,j] <- 0.6
@@ -276,7 +276,53 @@ image_write(nic,"nicole.png") # this saves the image as a separate file
 
 Is *runif* or *rnorm* more useful?  
 
+i like runif more, idrk y tho
+
+```{r}
+
+jumbleRed <- matrix(0,500,500)
+jumbleGreen <- matrix(0,500,500)
+jumbleBlue <- matrix(0,500,500)
+
+for (i in 1:500){
+  for (j in 1:500){
+    jumbleRed[i,j] <- runif(1)
+    jumbleGreen[i,j] <- runif(1)
+    jumbleBlue[i,j] <- runif(1)
+  }
+}
+
+jData <- array(c(jumbleRed,jumbleGreen,jumbleBlue),dim = c(500,500,3))
+
+jumble <- image_read(jData) 
+print(jumble)
+
+```
+
+
 ### Find out what happens if you use numbers larger than 1 or smaller than 0 in the three color channel matrices
+
+they simply cap out
+
+```{r}
+whaRed <- matrix(0,500,500)
+whaGreen <- matrix(0,500,500)
+whaBlue <- matrix(0,500,500)
+
+for (i in 1:500){
+  for (j in 1:500){
+    whaRed[i,j] <- 0
+    whaGreen[i,j] <- -1
+    whaBlue[i,j] <- 0
+  }
+}
+
+whaData <- array(c(whaRed,whaGreen,whaBlue),dim = c(500,500,3))
+
+wha <- image_read(whaData) 
+print(wha)
+```
+
 
 ### Create an image that looks gray 
 
@@ -289,10 +335,10 @@ You can do this by using exactly the same 2D matrix for all three color channels
 # before uncommenting, save an image to your working directory! 
 # this assumes the image is called "trees.png"
 
-#a = image_read("trees.png")
-#A = as.integer(a[[1]])
-#dim(A)
-#print(a)
+a = image_read("bean.jpeg")
+A = as.integer(a[[1]])
+dim(A)
+print(a)
 ```
 
 ### Important example: a rank-one matrix
