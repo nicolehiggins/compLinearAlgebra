@@ -1,0 +1,49 @@
+---
+title: "trapezoidRule"
+author: "Nicole"
+date: "2023-01-24"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Trapezoid Rule
+
+
+```{r function}
+# assuming n > 3
+trappin <- function(f,a,b,n){
+  xes <- seq(a, b, length = n)
+  y <- f(xes)
+  w <- b/(n-1)
+  area <- w * (y[1]+y[n])/2 + sum(y[2:(n-1)])
+  return(area)
+}
+
+
+# trappin((x^2 * exp(-x)), 0, 5, 11)
+
+f <- function(x){
+  return(x^2 * exp(-x))
+}
+
+sprintf('%.15f', trappin(f, 0, 5, 11))
+
+```
+
+## Plots
+
+```{r pressure, echo=FALSE}
+
+v <- 0:629/100
+x <- cos(v)
+y <- sin(v)
+par(bg = "#acfffc")
+plot(x,y,"l",lwd=3, asp = 1, col = "#ff9408",xlim = c(-1,1), ylim = c(-1,1), bty = 'n')
+
+
+```
+
+
