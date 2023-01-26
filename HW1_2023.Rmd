@@ -12,14 +12,7 @@ options(scipen = 1, digits = 16)
 ```
 
 
-## Homework 1, due Wednesday 1/25 at 5PM 
-Homework guidelines: 
-
-- Turn in this assignment as a PDF on Moodle, please! To create a PDF, I suggest knitting to HTML, then opening the HTML file in a browser and saving to PDF from there. 
-
-- You're invited to collaborate and discuss with each other, and then each person should turn in their own assignment, which should be their own work.  "Discussing" is very different from copying and I trust students to stay on the right side of this line. In general, anything you say out loud to another person is fine, and looking at a screen together (in person or on Zoom) is fine. Sharing files or screenshots is a bad idea. Name the people you work with below (question 0). 
-
-- If you start early, you're giving yourself the chance to ask questions and turn in a polished product. If you start late, you won't be able to get help as easily. 
+## Homework 1
 
 ### Q0: Names
 Who did you work with on this assignment? You'll get a bonus 5 points if you name someone and they name you. *No scores above 100% are allowed, but these bonus points can repair mistakes on this assignment*.
@@ -96,22 +89,53 @@ plot(x,y,log="xy")
 
 Comment carefully on the differences you see between the three versions. Then explain why a function of the form $y = x^p$ looks linear on a log-log plot. *Hint: let $w = \log_{10}(y)$ and let $t = \log_{10}(x)$, then show that there is a linear relationship between $t$ and $w$.*
 
-**The first plot is on traditionally scaled axes - that is, x and y increment by one each tick - and the resulting graph is nearly flat and difficult to interpret. The second plot scales the axes as logarithmic**
+**The first plot is on traditionally scaled axes - that is, x and y increment by one each tick - and the resulting graph is nearly flat and difficult to interpret. The second plot scales the axes as logarithmic, while the third plot assumes a logarithmic relationship.**
+
+**The relationship is linear on the second two plots because log(y) = log(x^-2) = -2log(x) by change of base so we see y = -2x when the plot is on a log scale.**
 
 ### Q5: Create a letter
 As on the Day 1 activity, create a color image showing the first letter of your name by building appropriate matrices in R. Give it a white background (initialize the matrices with 1's instead of 0's). Add it to the Google Doc, and also include it here.
+
+```{r creating a letter}
+library('magick')
+
+nRed <- matrix(1,500,500) # a 500x500 grid of zeros for each color
+nGreen <- matrix(1,500,500)
+nBlue <- matrix(1,500,500)
+
+for (i in 1:500){
+  for (j in 1:500){
+    if ((44<j & j<111) | (389<j & j<455) | (abs(j - i) < 62)){
+      nRed[i,j] <- 0.6
+      nBlue[i,j] <- 0.9
+      nGreen[i,j] <- 0.5
+      if (abs(j - i) < 27){
+        nRed[i,j] <- 0.7
+        nBlue[i,j] <- 1
+        nGreen[i,j] <- 0.6
+      }
+    }
+  }
+}
+
+nData <- array(c(nRed,nGreen,nBlue),dim = c(500,500,3))
+
+nic <- image_read(nData) 
+print(nic) # this displays the image in RStudio and knitted documents
+```
+
 
 ### Q6: High contrast image
 The image "Department.png" is a cropped version of a photo by Stefani Reynolds in a January 2023 article about the upcoming US debt ceiling crisis in the New York Times. It shows part of the Treasury Department building in Washington. It is a color image, but it looks pretty gray because for most pixels, the values in the R, G, and B channels are all close together. Save the image in the same folder as your main RMD file and then uncomment these lines to see it: 
 
 ```{r}
-#library("magick")
-#a = image_read("Department.png")
-#A = as.integer(a[[1]])/256
-#redA = A[,,1]
-#greenA = A[,,2]
-#blueA = A[,,3]
-#print(a) # this displays the image in RStudio and knitted documents
+library("magick")
+a = image_read("Department.png")
+A = as.integer(a[[1]])/256
+redA = A[,,1]
+greenA = A[,,2]
+blueA = A[,,3]
+print(a) # this displays the image in RStudio and knitted documents
 ```
 
 We will make a high-contrast version of this image using a new code trick: updating a matrix or vector using conditional tests. 
@@ -137,6 +161,19 @@ print(a) # we should see about half zeros, half positive numbers
 
 The three matrices redA, greenA, and blueA contain numbers between 0 and 1. Pick a cutoff between 0 and 1 (0.5 is a good choice but you can experiment) and then set all entries to 1 if they're greater than the cutoff, or 0 otherwise. Then display the altered image, the "high contrast" version. It should be mostly black-and-white but there will be some colored pixels - explain why. 
 
+```{r high contrast}
+redA[redA>0.5] <- 1
+greenA[greenA>0.5] <-1
+blueA[blueA>0.5] <- 1
+
+newA <- array(c(redA,greenA,blueA), dim = c(382,370,3))
+
+highCon <- image_read(newA) 
+
+print(highCon)
+```
+
+**The resulting image has some colored pixels because the cutoff might make some mid-tones as fully one color or another. For example, if a pixel has rgb values (0.6, 0.1, 0), the red value will increase to 1 and the pixel will appear red.**
 
 
 
