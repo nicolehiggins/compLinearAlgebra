@@ -8,13 +8,6 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-Homework guidelines: 
-
-- Turn in this assignment as a PDF on Moodle, please! To create a PDF, I suggest knitting to HTML, then opening the HTML file in a browser and saving to PDF from there. 
-
-- You're invited to collaborate and discuss with each other, and then each person should turn in their own assignment, which should be their own work.  "Discussing" is very different from copying and I trust students to stay on the right side of this line. In general, anything you say out loud to another person is fine, and looking at a screen together (in person or on Zoom) is fine. Sharing files or screenshots is a bad idea. Name the people you work with below (question 0). 
-
-- If you start early, you're giving yourself the chance to ask questions and turn in a polished product. If you start late, you won't be able to get help as easily. 
 
 ### Q0 Collaborators
 Who did you work with on this assignment? You'll get a bonus 5 points if you name someone and they name you. *No scores above 100% are allowed, but these bonus points can repair mistakes on this assignment*.
@@ -22,11 +15,6 @@ Who did you work with on this assignment? You'll get a bonus 5 points if you nam
 **I worked with Jonny**
 
 ### Q1 Some flop counts
-A *flop count* or *floating-point operation count* is a way of measuring how many arithmetic operations are required to carry out an algorithm. For example, the line 
-```{r}
-x <- 2*(3+4+5)
-```
-uses three flops, two additions and one multiplication. A flop count is an imperfect measure of the electricity or time required to run a program; it ignores parallelism and it also ignores memory issues. Still, flop counts are worth considering when comparing different procedures. 
 
 Let $A$ be a $1000\times1000$ matrix and let $x\in\mathbb{R}^{1000}$.  
 
@@ -40,11 +28,11 @@ Let $A$ be a $1000\times1000$ matrix and let $x\in\mathbb{R}^{1000}$.
 
 - How many flops are required to compute the matrix-matrix product $AA$?
 
-**1,999,000,000**
+**1,999,000,000 flops**
 
 - Suppose $B$ is a rank-one matrix, $B=uv^T$ where $u,v\in\mathbb{R}^{1000}$. To form $Bx$ cheaply we should do $u(v^Tx)$ instead of $(uv^T)x$. How many flops are needed? 
 
-**2,999**
+**2,999 flops**
 
 
 ### Q2 Eigenvalues of a real, symmetric matrix
@@ -55,7 +43,7 @@ Let $A$ be a $1000\times1000$ matrix and let $x\in\mathbb{R}^{1000}$.
 
 - Explain why $x^*x$ is real for any $x\in\mathbb{C}^n$. 
 
-**$x^*x$ is real for any $x\in\mathbb{C}^n$ because the product of two opposite imaginary binomials will result in a canceling out of the singular i's and any $i^2* is $-1$, so the product is always real.**
+**$x^*x$ is real for any $x\in\mathbb{C}^n$ because the product of two opposite imaginary binomials will result in a canceling out of the singular i's and any resulting $i^2* are equal to $-1$, so the product is always real.**
 
 - Suppose that $A$ is an $n\times n$ matrix with real or complex entries and that $x$ is a vector in $\mathbb{R}^n$ or $\mathbb{C}^n$. Is $x^*Ax$ a number, vector, or matrix? 
 
@@ -63,18 +51,34 @@ Let $A$ be a $1000\times1000$ matrix and let $x\in\mathbb{R}^{1000}$.
 
 - Suppose $A=A^*$ (this includes the case where $A$ is real and symmetric). Suppose that $Ax = \lambda x$ for some nonzero $x$. That is, $x$ is an eigenvector of $A$ with eigenvalue $\lambda$. Show that $x^*Ax = (x^*Ax)^*$, which proves that $x^*Ax$ is real. Then show that $x^*Ax = \lambda x^*x$. Explain why this means that $\lambda$ must be a real number. 
 
-****
+**First, given $A=A^*$, we know $x^*Ax=x^*A^*x$ and since a transposed transpose reverts a matrix to its original form, we then know $x^*AX=x^*A^*(x^*)^*$. Given transpose product rules, we then know $x^*Ax=(x^*Ax)^*$.**
+
+
+**Next, given $Ax= \lambda x$, we know $x^*Ax=x^* \lambda x$ which equals $\lambda x^*x$ since $\lambda$ is a scalar.**
+
+
+**These results prove that $\lambda$ is real since by isolating it in the final equality, we see that $\lambda = x^*Ax/(x^*x)$ and since both the numerator and denominator here are real, $\lambda$ must be as well.**
 
 - Form the matrices $P$ and $S$ in R and use the syntax *eigen(A)$values* to find their eigenvalues. (According to the result we proved, $S$ should have real eigenvalues and $P$ might or might not have real eigenvalues). 
 $$P = \begin{pmatrix} -4&5&6\\1&0&9 \\9&1&2\end{pmatrix}
 \qquad
 S = \begin{pmatrix} -1&2&1\\2&7&-3\\1&-3&4\end{pmatrix}$$
 
+```{r Q2.5}
+pData = c(-4,1,9,5,0,1,6,9,2)
+sData = c(-1,2,1,2,7,-3,1,-3,4)
+
+P = matrix(pData, 3, 3)
+S = matrix(sData, 3, 3)
+
+print(P)
+print(S)
+
+eigen(P)$values
+eigen(S)$values
+```
 
 ### Q3 Underdetermined system 
-When a system of linear equations has many solutions, it is called *underdetermined.*
-In this situation it doesn't make sense to ask for "the solution," but we can ask for "the *smallest* solution." Different choices of norm for measuring the size of the solution vector lead to different answers! 
-
 Let's consider a case with one equation and three unknowns: $$ 3x + 5y + 6z = 210.$$
 
 (a) Find the smallest solution as measured in the two-norm. *Hint: you are finding the shortest distance from the origin to a plane. One approach is to use Lagrange multipliers to minimize $x^2+y^2+z^2$, with the equation above acting as the constraint.*
@@ -91,8 +95,7 @@ Let's consider a case with one equation and three unknowns: $$ 3x + 5y + 6z = 21
 
 (d) Do a web search for "one-norm minimization." You should quickly learn that $\ell^1$ minimization has become important in the last 20 years because of its tendency to produce *sparse solutions.* What does that mean? Did this happen in part (b) for you?  
 
-**sparse means more than half the entries are zero. this happened in part (b) since two of the three entries are zero.**
-
+**Sparse means more than half the entries are zero. This happened in part (b) since two of the three entries are zero.**
 
 ### Q4 Not a norm
 We said that the $p$-norm requires $p\in(1,\infty)$. Here we'll see what goes wrong if we try $p=\frac12$. That would lead to 
@@ -107,16 +110,33 @@ $$ \|x\|_{1/2} = \left(\sqrt{|x_1|} + \sqrt{|x_2|}+\cdots +\sqrt{|x_n|}\right)^2
 **v = [1,1,0], w = [0, 0, 1]**
 
 ### Q5 Trapezoid rule with user-specified tolerance
-Write an R function that carries out trapezoidal rule integration to a specified error tolerance (the user does not specify the number of quadrature nodes). The first line should be something like this: 
-```{r}
+Write an R function that carries out trapezoidal rule integration to a specified error tolerance:
+
+**I first drew a diagram of what the function would be doing. Then I wrote some pseudo-code to better understand the order of the function. Finally, I worked with Jonny to translate the writing into code.**
+
+```{r Q5 function}
 my.trapezoid <- function(f, a, b, tol=1e-6){
-  
+  #initial amt of measurements  
+  n <- 4
+  #initialize tolerance to 1
+  tolerance <- 1
+  actual <- integrate(f,a,b)
+  #while tolerance is higher than our threshold, compute integral with 2n measurements
+  while (tolerance > tol){
+    #find integral with trap method
+    x <- seq(a,b,length = n)
+    y <- f(x)
+    h <- (b-a) / (n-1)
+    area <- (h * sum(y[1:(n-1)]) / 2) + (h * sum(y[2:n]) / 2)
+    #calculates and updates tolerance
+    tolerance <- abs(area - actual$value)/actual$value
+    error <- abs(area-actual$value)
+    #set n to 2n
+    n <- n*2
+  }
+  return(c(area,error))
 }
 ```
-Here $f$ is a function, $[a,b]$ is the integration interval, and *tol* is the desired accuracy of the result, with default value $10^{-6}$. 
-One challenge here is that you don't know the exact answer, so it's not obvious how many nodes you'll need or how you would know whether or not your solution is sufficiently close to the true value! One strategy (among many) is to compute it with some number of nodes, then double the number of nodes and try again. If the two answers are sufficiently close together, then you have confidence that your solution is accurate; otherwise you can try again with even more nodes. 
-
-This programming question requires you to make some choices along the way, and there are many reasonable solutions. On this and similar questions, you should write a few sentences describing how you approached the problem AND put comments in your code. 
 
 Finally, demonstrate your function by solving these three integrals to accuracy $10^{-4}$. As a check, the exact value of $I$ is $1.0$. 
 $$ 
@@ -124,61 +144,100 @@ I = \int_0^{100} \frac{3\sqrt{w}}{2000}\,dw,\qquad
 J = \int_2^5 \exp((x-3)(x-4))\,dx,\qquad K = \int_{-\pi}^{\pi} \frac{\cos^2(3t+1)}{1.05 + \sin(t)}\,dt.
 $$
 
+```{r Q5 calls}
+#formulas
+fi <- function(x) {
+  return((3*sqrt(x))/2000)
+}
+fj <- function(x) {
+  return(exp((x-3)*(x-4)))
+}
+fk <- function(x) {
+  return((cos(3*x+1)^2)/(1.05 + sin(x)))
+}
 
-### Q6 The trapezoid rule is spectrally accurate for periodic problems
-Explore how the error of the trapezoid rule depends on the number of nodes for the integrals $J$ and $K$ in the previous question. To do this, make a loglog plot with $n$ (number of quadrature nodes or function measurements) on the horizontal axis and $E$ (the absolute value of the difference between the true integral and the trapezoid rule estimate) on the vertical axis. 
-
-As a demonstration of the plotting syntax, here is an example of a loglog plot showing two fake error curves. 
-```{r}
-n <- 2^(2:12)
-fake.error.1 <- 1.08^(-n) + 1e-16
-fake.error.2 <- n^(-4)
-plot(n,fake.error.1,type='p',log='xy',col="blue",pch=8,xlab="n",ylab="error")
-lines(n,fake.error.2,type='p',pch=12)
-legend("topright",legend=c("e1","e2"),pch=c(8,12),lwd=2,col=c("blue","black"))
+sprintf("%.15f",my.trapezoid(fi, 0, 100))
+sprintf("%.15f",my.trapezoid(fj, 2,5))
+sprintf("%.15f",my.trapezoid(fk, -pi, pi))
 ```
 
-In the correct solution, **fake.error.1[j]** should be the error of the trapezoid rule for integral $J$ using **n[j]** function evaluations, while **fake.error.2** should be the errors for integral $K$. 
+
+### Q6 The trapezoid rule is spectrally accurate for periodic problems
+Explore how the error of the trapezoid rule depends on the number of nodes for the integrals $J$ and $K$ in the previous question. To do this, make a loglog plot with $n$ (number of quadrature nodes or function measurements) on the horizontal axis and $E$ (the absolute value of the difference between the true integral and the trapezoid rule estimate) on the vertical axis. \
+
+```{r Q6 trap function}
+#same function, but only find the error of one trap calculation for a specific n
+my.trapezoid2 <- function(f, a, b, n){
+  area <- 0
+  actual <- integrate(f,a,b)
+  x <- seq(a,b,length = n)
+  y <- f(x)
+  h <- (b-a) / (n-1)
+  area <- (h * sum(y[1:(n-1)]) / 2) + (h * sum(y[2:n]) / 2)
+  error <- abs(area-actual$value)
+  return(error)
+}
+```
+
+```{r Q6 data}
+nlist = c(2,4,10,100,200,500,1000,2500,5000)
+i = 1
+errors = 0
+for(n in nlist){
+  errors[i] = my.trapezoid2(fj,2,5,n)
+  i = i + 1
+}
+i = 1
+errors.1 = 0
+for(n in nlist){
+  errors.1[i] = my.trapezoid2(fk,-pi,pi,n)
+  i = i + 1
+}
+```
+
+```{r Q6 plot}
+x <- nlist
+plot(x,errors,type='p',log='xy',col="blue",pch=8,xlab="n",ylab="error")
+lines(x,errors.1,type='p',pch=12)
+legend("topright",legend=c("e1","e2"),pch=c(8,12),lwd=2,col=c("blue","black"))
+```
 
 ### Q7 Secant
 Implement the secant method and use it to find a value of $x$ where $\cosh(x) = \sinh(x) + 0.1$. Give at least twelve correct digits. Explain how you pick the two initial guesses. 
 
+```{r Q7}
+g <- function(x) {
+  return(cosh(x) - sinh(x) - 0.1)
+}
 
+x <- -50:-35
+plot(x, g(x))
+
+secant <- function(func, x0, x1, tol = 1e-12){
+  f <- func
+  x2 <- x1 - f(x1) * (x1 - x0) / (f(x1) - f(x0))
+  iteration <- 2
+  while (abs(x2 - x1) > tol) {
+    x0 <- x1
+    x1 <- x2
+    x2 <- x1 - f(x1) * (x1 - x0) / (f(x1) - f(x0))
+    iteration <- iteration + 1
+  }
+  return(x2)
+}
+
+sprintf("%.15f", secant (g, 2.2, 2.4))
+```
+
+**To choose the initial guesses, I plotted the function on a standard xy graph, then found where the function crossed the x-axis -- choosing one guess from each side of this crossing.**
 
 ### Q8 Five simple versions of $Ax=b$
 In each of the five cases, find the vector $x$ which solves the problem $Ax=b$. Do it by hand. Missing entries are zeros. It is OK to not show work, but please write at least one sentence describing your method in each case. It is OK to write on paper and scan/photograph your answers as long as you turn in a single PDF as your solution. 
 
-Diagonal:
-$$A = \begin{pmatrix}
-2&&\\&3&\\&&-0.5
-\end{pmatrix};\quad b = \begin{pmatrix}3\\6\\5  \end{pmatrix}$$
+```{r Q8}
+library("magick")
+work = image_read("hw2q8.png")
+print(work)
+```
 
-Upper triangular: 
-$$
-A = \begin{pmatrix}
-2&1&-1\\&3&2\\&&-0.5
-\end{pmatrix};\quad b = \begin{pmatrix}3\\7\\5  \end{pmatrix}
-$$
-
-Lower triangular:
-$$A = \begin{pmatrix}
-2&&\\0&3&\\-1&3&-0.5
-\end{pmatrix};\quad b = \begin{pmatrix}4\\6\\5  \end{pmatrix}$$
-
-Orthogonal: 
-$$
-A = \begin{pmatrix}
-\frac{-1}{9}&\frac{8}{9}&\frac{4}{9}\\\frac{8}{9}&\frac{-1}{9}&\frac{4}{9}\\\frac{4}{9}&\frac{4}{9}&\frac{-7}{9}
-\end{pmatrix};\quad b = \begin{pmatrix}3\\6\\9  \end{pmatrix}
-$$
-
-Permutation:
-$$
-A = \begin{pmatrix}
-0&1&0&0\\0&0&0&1\\1&0&0&0\\0&0&1&0
-\end{pmatrix};\quad b = \begin{pmatrix}3\\6\\5\\1  \end{pmatrix}
-$$
-
-
-
-
+**thank you!**
