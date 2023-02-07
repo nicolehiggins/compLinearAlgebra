@@ -1,0 +1,348 @@
+---
+title: "HW2, due Thursday 2/2 at 5PM"
+author: "Jonny Xue"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+Homework guidelines: 
+
+- Turn in this assignment as a PDF on Moodle, please! To create a PDF, I suggest knitting to HTML, then opening the HTML file in a browser and saving to PDF from there. 
+
+- You're invited to collaborate and discuss with each other, and then each person should turn in their own assignment, which should be their own work.  "Discussing" is very different from copying and I trust students to stay on the right side of this line. In general, anything you say out loud to another person is fine, and looking at a screen together (in person or on Zoom) is fine. Sharing files or screenshots is a bad idea. Name the people you work with below (question 0). 
+
+- If you start early, you're giving yourself the chance to ask questions and turn in a polished product. If you start late, you won't be able to get help as easily. 
+
+### Q0 Collaborators
+Who did you work with on this assignment? You'll get a bonus 5 points if you name someone and they name you. *No scores above 100% are allowed, but these bonus points can repair mistakes on this assignment*.
+
+Nicole Higgins,
+
+Amalin
+
+### Q1 Some flop counts
+A *flop count* or *floating-point operation count* is a way of measuring how many arithmetic operations are required to carry out an algorithm. For example, the line 
+```{r}
+x <- 2*(3+4+5)
+```
+uses three flops, two additions and one multiplication. A flop count is an imperfect measure of the electricity or time required to run a program; it ignores parallelism and it also ignores memory issues. Still, flop counts are worth considering when comparing different procedures. 
+
+Let $A$ be a $1000\times1000$ matrix and let $x\in\mathbb{R}^{1000}$.  
+
+- How many flops (additions and multiplications of real numbers) are required to compute the inner product $x^Tx$? 
+1999
+
+1000 flops to for multiplication and 999 flops for adding it all up
+
+- How many flops are required to compute the matrix-vector product $Ax$? 
+
+(1000)^2 + 1000*999 =
+1999000
+
+(1000)^2 represents the multiplication operations of doing the dot product of x with each row of A. Since X is 1000 long and there are 1000 rows, we get 1000^2 operations. We then have 1000*999 operations since we have to add 999 numbers for each of our 1000 rows. 
+
+- How many flops are required to compute the matrix-matrix product $AA$?
+
+
+1000 * ((1000)^2 + 1000*999)=
+1999000000
+
+
+- Suppose $B$ is a rank-one matrix, $B=uv^T$ where $u,v\in\mathbb{R}^{1000}$. To form $Bx$ cheaply we should do $u(v^Tx)$ instead of $(uv^T)x$. How many flops are needed? 
+
+$v^Tx$ = 1000 + 999 (see question 1)
+
+$v^Tx$ is a scalar so that means that we just need to multiply every value of u by 1000. This gives 2,999 flops total. 
+
+
+### Q2 Eigenvalues of a real, symmetric matrix
+
+- Let $w = \begin{pmatrix}2+3i\\4-i\\-10i\end{pmatrix}\in\mathbb{C}^2.$ Find $w^*w$ where $w^*$ is the result of taking the transpose and then also changing the sign of the imaginary parts (for example, changing $10+5i$ into $10-5i$). The $*$ operation is called the "Hermitian transpose" and it has the same rules as the ordinary transpose: $(AB)^* = B^*A^*$, $(A+B)^* = A^*+B^*$ and so on.  
+
+
+- Explain why $x^*x$ is real for any $x\in\mathbb{C}^n$. 
+
+Since we are finding the dot product, every entry in x gets multiplied its counterpart in x^*. If an entry is a complex number in x, then multiplying that entry by its reversed sign will result in a binomial expression of the form i^2 + ni -ni + c. i either becomes -1 because of i^2, and/or the i gets canceled out from ni -ni. Either way, no complex numbers will remain. 
+
+- Suppose that $A$ is an $n\times n$ matrix with real or complex entries and that $x$ is a vector in $\mathbb{R}^n$ or $\mathbb{C}^n$. Is $x^*Ax$ a number, vector, or matrix? 
+
+It is a number because the result of a 1xn matrix * nxn matrix * nx1 matrix is a number.
+
+- Suppose $A=A^*$ (this includes the case where $A$ is real and symmetric). Suppose that $Ax = \lambda x$ for some nonzero $x$. That is, $x$ is an eigenvector of $A$ with eigenvalue $\lambda$. Show that $x^*Ax = (x^*Ax)^*$, which proves that $x^*Ax$ is real. Then show that $x^*Ax = \lambda x^*x$. Explain why this means that $\lambda$ must be a real number. 
+
+$x^*Ax = (x^*Ax)^*$
+
+$x^*Ax = x^*A^*(x^*)^*$
+
+The product of the transpose of some matrices can be rewritten as the transpose of each individual matrix in reverse order. Transpose of transposed vector returns the original vector. 
+
+$x^*Ax = x^*A^*x$
+
+and since $A=A^*$, then
+
+$x^*Ax = x^*Ax$
+
+Also
+
+$x^*Ax = \lambda x^*x$
+
+and since $Ax = \lambda x$ and $\lambda$ is a scalar,
+
+$x^*\lambda x = \lambda x^*x$
+
+$\lambda x^* x = \lambda x^*x$
+
+We have proved that even if x contains complex numbers, multiplying x by its hermitian transpose will always return a real number. We also showed that $x^*Ax$ is real. If we isolate the eigenvalue, we get
+
+$x^*Ax/(x^*x)$
+
+since both the numerator and denominator are real, the eigenvalue must be real.
+
+- Form the matrices $P$ and $S$ in R and use the syntax *eigen(A)$values* to find their eigenvalues. (According to the result we proved, $S$ should have real eigenvalues and $P$ might or might not have real eigenvalues). 
+$$P = \begin{pmatrix} -4&5&6\\1&0&9 \\9&1&2\end{pmatrix}
+\qquad
+S = \begin{pmatrix} -1&2&1\\2&7&-3\\1&-3&4\end{pmatrix}
+$$
+
+```{r}
+P <- c(-4,1,9,5,0,1,6,9,2)
+S <- c(-1,2,1,2,7,-3,1,-3,4)
+dim(P) <- c(3,3)
+dim(S) <- c(3,3)
+print(P)
+print(S)
+
+eigen(S)$values
+
+eigen(P)$values
+```
+
+
+
+### Q3 Underdetermined system 
+When a system of linear equations has many solutions, it is called *underdetermined.*
+In this situation it doesn't make sense to ask for "the solution," but we can ask for "the *smallest* solution." Different choices of norm for measuring the size of the solution vector lead to different answers! 
+
+Let's consider a case with one equation and three unknowns: $$ 3x + 5y + 6z = 210.$$
+
+(a) Find the smallest solution as measured in the two-norm. *Hint: you are finding the shortest distance from the origin to a plane. One approach is to use Lagrange multipliers to minimize $x^2+y^2+z^2$, with the equation above acting as the constraint.*
+
+distance = abs(ax + by + cz)/sqrt(a^2 + b^2 + c^2)
+
+=abs(3*0 + 5*0 + 6*0 -210)/sqrt(3^2+5^2+6^2)
+
+=210/8.36660026534
+
+=25.099800796
+
+(9,15,18)
+
+(b) Find the smallest solution as measured in the one-norm.
+
+(0,0,35), 6z = 210
+
+(c) Find the smallest solution as measured in the max-norm.
+
+(15,15,15), 14x=210
+
+(d) Do a web search for "one-norm minimization." You should quickly learn that $\ell^1$ minimization has become important in the last 20 years because of its tendency to produce *sparse solutions.* What does that mean? Did this happen in part (b) for you? 
+
+Sparse solutions means more than half of the entries are 0. The two norm discourages sparsity since it would yield diminishing returns as values come to 0. The solution for part b was sparse.
+
+### Q4 Not a norm
+We said that the $p$-norm requires $p\in(1,\infty)$. Here we'll see what goes wrong if we try $p=\frac12$. That would lead to 
+$$ \|x\|_{1/2} = \left(\sqrt{|x_1|} + \sqrt{|x_2|}+\cdots +\sqrt{|x_n|}\right)^2.$$
+
+(a) Find $\|x\|_{1/2}$ if $x^T = (100\;\;\;-25\;\;\;16\;\;\;0)$. 
+
+
+
+(b) Find an example in $\mathbb{R}^3$ where the triangle inequality fails. That is, give vectors $v,w\in\mathbb{R}^3$ such that $\|v+w\|_{1/2} > \|v\|_{1/2} + \|w\|_{1/2}$. Your example should have nice enough numbers that you can do this on paper, without calculator / R help.
+
+![Question 4 A and B!](CLAHW.JPG)
+
+### Q5 Trapezoid rule with user-specified tolerance
+Write an R function that carries out trapezoidal rule integration to a specified error tolerance (the user does not specify the number of quadrature nodes). The first line should be something like this: 
+```{r}
+#function for I
+f1 <- function(x) {
+  return((3*sqrt(x))/2000)
+}
+#function for J
+f2 <- function(x) {
+  return(exp((x-3)*(x-4)))
+}
+#function for K
+f3 <- function(x) {
+  return((cos(3*x+1)^2)/(1.05 + sin(x)))
+}
+
+#this function takes a function f, two indices (a,b) and a tolerance value. This function continuously uses the trap method to find the integral of f-increasing the size of measurements every iteration. When the dif between the actual integral and the trap method's integral is low enough to meet our tolerance threshold, the loop ends and returns the calculated area and error. 
+
+my.trapezoid <- function(f, a, b, tol=1e-6){
+  #initial amt of measurements  
+  n <- 4
+  #initialize tolerance to 1. Will continue to get smaller as 
+  tolerance <- 1
+  actual <- integrate(f,a,b)
+  #while tolerance is higher than our threshold, compute integral with 2n measurements
+  while (tolerance > tol){
+    #find integral with trap method
+    x <- seq(a,b,length = n)
+    y <- f(x)
+    h <- (b-a) / (n-1)
+    area <- (h * sum(y[1:(n-1)]) / 2) + (h * sum(y[2:n]) / 2)
+    #calculates and updates tolerance
+    tolerance <- abs(area - actual$value)/actual$value
+    error <- abs(area-actual$value)
+    #set n to 2n
+    n <- n*2
+  }
+  return(c(area,error))
+}
+
+sprintf("%.15f",my.trapezoid(f1,0,100,tol=1e-6))
+sprintf("%.15f",my.trapezoid(f2,2,5,tol=1e-6))
+sprintf("%.15f",my.trapezoid(f3,-pi,pi,tol=1e-6))
+```
+Here $f$ is a function, $[a,b]$ is the integration interval, and *tol* is the desired accuracy of the result, with default value $10^{-6}$. 
+One challenge here is that you don't know the exact answer, so it's not obvious how many nodes you'll need or how you would know whether or not your solution is sufficiently close to the true value! One strategy (among many) is to compute it with some number of nodes, then double the number of nodes and try again. If the two answers are sufficiently close together, then you have confidence that your solution is accurate; otherwise you can try again with even more nodes. 
+
+This programming question requires you to make some choices along the way, and there are many reasonable solutions. On this and similar questions, you should write a few sentences describing how you approached the problem AND put comments in your code. 
+
+Finally, demonstrate your function by solving these three integrals to accuracy $10^{-4}$. As a check, the exact value of $I$ is $1.0$. 
+$$ 
+I = \int_0^{100} \frac{3\sqrt{w}}{2000}\,dw,\qquad
+J = \int_2^5 \exp((x-3)(x-4))\,dx,\qquad K = \int_{-\pi}^{\pi} \frac{\cos^2(3t+1)}{1.05 + \sin(t)}\,dt.
+$$
+
+
+### Q6 The trapezoid rule is spectrally accurate for periodic problems
+Explore how the error of the trapezoid rule depends on the number of nodes for the integrals $J$ and $K$ in the previous question. To do this, make a loglog plot with $n$ (number of quadrature nodes or function measurements) on the horizontal axis and $E$ (the absolute value of the difference between the true integral and the trapezoid rule estimate) on the vertical axis. 
+
+As a demonstration of the plotting syntax, here is an example of a loglog plot showing two fake error curves.
+
+```{r}
+#same function, but only find the error of one trap calculation for a specific n
+my.trapezoid2 <- function(f, a, b, n){
+  area <- 0
+  actual <- integrate(f,a,b)
+  x <- seq(a,b,length = n)
+  y <- f(x)
+  h <- (b-a) / (n-1)
+  area <- (h * sum(y[1:(n-1)]) / 2) + (h * sum(y[2:n]) / 2)
+  error <- abs(area-actual$value)
+  return(error)
+}
+```
+
+```{r}
+nlist = c(2,4,10,100,200,500,1000,2500,5000)
+i = 1
+errors = 0
+for(n in nlist){
+  errors[i] = my.trapezoid2(f2,2,5,n)
+  i = i + 1
+}
+i = 1
+errors.1 = 0
+for(n in nlist){
+  errors.1[i] = my.trapezoid2(f3,-pi,pi,n)
+  i = i + 1
+}
+```
+
+```{r}
+x <- nlist
+plot(x,errors,type='p',log='xy',col="blue",pch=8,xlab="n",ylab="error")
+lines(x,errors.1,type='p',pch=12)
+legend("topright",legend=c("e1","e2"),pch=c(8,12),lwd=2,col=c("blue","black"))
+
+```
+
+
+In the correct solution, **fake.error.1[j]** should be the error of the trapezoid rule for integral $J$ using **n[j]** function evaluations, while **fake.error.2** should be the errors for integral $K$. 
+
+
+### Q7 Secant
+Implement the secant method and use it to find a value of $x$ where $\cosh(x) = \sinh(x) + 0.1$. Give at least twelve correct digits. Explain how you pick the two initial guesses. 
+
+```{r}
+g <- function(x) {
+  return(cosh(x) - sinh(x) - 0.1)
+}
+
+x <- -50:-35
+plot(x,g(x))
+
+
+secant <- function(func, x0, x1, tol = 1e-12){
+  f <- func
+  x2 <- x1 - f(x1) * (x1 - x0) / (f(x1) - f(x0))
+  iteration <- 2
+  while (abs(x2 - x1) > tol) {
+    x0 <- x1
+    x1 <- x2
+    x2 <- x1 - f(x1) * (x1 - x0) / (f(x1) - f(x0))
+    iteration <- iteration + 1
+  }
+  return(x2)
+}
+sprintf("%.15f",secant(g, 2.2, 2.4, tol = 1e-12))
+
+
+```
+I plotted the function on a normal xy graph. I found where the function crossed the x axis and found two x coordinates on either side of the intersction.
+
+
+
+### Q8 Five simple versions of $Ax=b$
+In each of the five cases, find the vector $x$ which solves the problem $Ax=b$. Do it by hand. Missing entries are zeros. It is OK to not show work, but please write at least one sentence describing your method in each case. It is OK to write on paper and scan/photograph your answers as long as you turn in a single PDF as your solution. 
+
+Diagonal:
+$$A = \begin{pmatrix}
+2&&\\&3&\\&&-0.5
+\end{pmatrix};\quad b = \begin{pmatrix}3\\6\\5  \end{pmatrix}$$
+$x^T = (1.5\;\;\;2\;\;\;-10)$
+Dividing diagonal of A by corresponding entries in B will yield our x
+
+Upper triangular: 
+$$
+A = \begin{pmatrix}
+2&1&-1\\&3&2\\&&-0.5
+\end{pmatrix};\quad b = \begin{pmatrix}3\\7\\5  \end{pmatrix}
+$$
+$x^T = (-8\;\;\;9\;\;\;-10)$
+We can set -.05*x3 = 5 in order to find x3. We can then just plug in to find x2 and x1
+
+
+Lower triangular:
+$$A = \begin{pmatrix}
+2&&\\0&3&\\-1&3&-0.5
+\end{pmatrix};\quad b = \begin{pmatrix}4\\6\\5  \end{pmatrix}$$
+$x^T = (2\;\;\;2\;\;\;-2)$
+We can do forward substitution to find x1 and solve for x2 and x3.
+
+Orthogonal: 
+$$
+A = \begin{pmatrix}
+\frac{-1}{9}&\frac{8}{9}&\frac{4}{9}\\\frac{8}{9}&\frac{-1}{9}&\frac{4}{9}\\\frac{4}{9}&\frac{4}{9}&\frac{-7}{9}
+\end{pmatrix};\quad b = \begin{pmatrix}3\\6\\9  \end{pmatrix}
+$$
+$x^T = (9\;\;\;6\;\;\;-3)$
+Mulitply tranpose of A and b.
+
+
+Permutation:
+$$
+A = \begin{pmatrix}
+0&1&0&0\\0&0&0&1\\1&0&0&0\\0&0&1&0
+\end{pmatrix};\quad b = \begin{pmatrix}3\\6\\5\\1  \end{pmatrix}
+$$
+
+$x^T = (5\;\;\;3\;\;\;1\:\:6)$
+Entries of 1 in A determine entries of b in x. (3,1) of A is 1 so entry 3 of b goes to entry 1 of x.
+

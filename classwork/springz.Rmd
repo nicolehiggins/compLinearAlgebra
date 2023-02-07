@@ -1,0 +1,35 @@
+---
+title: "springzzz"
+author: "Nicole"
+date: "2023-02-02"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library('magick')
+```
+
+## R Markdown
+
+```{r}
+my.springs <- function(K, m, H, g = 9.8) {
+  A <- c(-2*K,K,0,0,
+         K,-2*K,K,0,
+         0,K,-2*K,K,
+         0,0,K,-2*K)
+  dim(A) <- c(4,4)
+  b <- c(g*m, g*m, g*m, (g*m)-(K*H))
+  soln <- solve(A) %*% b
+  return(soln)
+}
+
+my.springs(8,3,50)
+```
+
+```{r}
+diagram <- image_read('springDiagram.png') 
+print(diagram)
+```
+
+

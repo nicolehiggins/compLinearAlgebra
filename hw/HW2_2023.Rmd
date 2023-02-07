@@ -110,6 +110,7 @@ $$ \|x\|_{1/2} = \left(\sqrt{|x_1|} + \sqrt{|x_2|}+\cdots +\sqrt{|x_n|}\right)^2
 Write an R function that carries out trapezoidal rule integration to a specified error tolerance (the user does not specify the number of quadrature nodes). The first line should be something like this: 
 ```{r}
 my.trapezoid <- function(f, a, b, tol=1e-6){
+  
 }
 ```
 Here $f$ is a function, $[a,b]$ is the integration interval, and *tol* is the desired accuracy of the result, with default value $10^{-6}$. 
