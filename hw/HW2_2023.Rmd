@@ -1,5 +1,5 @@
 ---
-title: "HW2, due Thursday 2/2 at 5PM"
+title: "HW2"
 author: "Nicole Higgins"
 date: "`r Sys.Date()`"
 output: html_document
