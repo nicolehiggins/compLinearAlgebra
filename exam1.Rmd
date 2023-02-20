@@ -1,0 +1,39 @@
+---
+title: "exam1"
+author: "Nicole"
+date: "2023-02-16"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Problem 5
+
+```{r problem 5}
+# creating the function
+
+eigenQR <- function(matrix, n=200){
+  i = 0 # initialize iteration
+  M = matrix # initialize matrix
+  while (i < n){
+    # i used a while loop in case I want to replace the n iteration with a logic check
+    QR = qr(M) # qr decomposition of the matrix
+    M = qr.R(QR) %*% qr.Q(QR) # replaces the matrix with RQ
+    i = i+1 # iterates
+  }
+  return(M)
+}
+
+#creating A
+
+aData = c(11,10,-2,100,3,40,-6,300,5,50,0,4,10,100,-20,14) # the data
+A = matrix(aData, 4, 4) # creates a matrix from the data
+
+# calling the function
+
+eigenQR(A)
+```
+
+
