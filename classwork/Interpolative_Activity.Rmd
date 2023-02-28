@@ -1,6 +1,6 @@
 ---
 title: "SVD + Interpolative + Radio"
-author: "Will Mitchell"
+author: "Nicole Higgins"
 date: "`r Sys.Date()`"
 output: html_document
 ---
@@ -16,11 +16,24 @@ knitr::opts_chunk$set(echo = TRUE)
 #### E1: Make random sources
 Create 120 random points inside the box $[6,7]\times[4,5]$.  Make a plot showing them. 
 
+```{r}
+e1x <- runif(120, 6, 7)
+e1y <- runif(120, 4, 5)
+
+plot(e1x, e1y)
+```
 
 
 
 #### E2: Make random targets
 Create 100 random points inside the box $[0,1]\times[0,1]$.  Make a plot showing them. 
+
+```{r}
+e2x <- runif(100, 0, 1)
+e2y <- runif(100, 0, 1)
+
+plot(e2x, e2y)
+```
 
 
 #### E3: Evaluate the signal at one target. 
@@ -32,6 +45,21 @@ Note that the total strength will be weaker if the sources are far from the targ
 
 Suppose that the strength of source $j$ is the number $100/\sqrt{j+2}$.  Then find the strength of the signal perceived by the first target - that is, evaluate $s_1$.  
 
+```{r}
+s1x <- e2x[1]
+s1y <- e2y[1]
+
+
+s1 <- 0
+for(j in 1:120){
+  strength <- 100/sqrt(j+2)
+  jsum <- strength/sqrt((s1x-e1x[j])^2+(s1y-e1y[j])^2)
+  s1 <- s1 + jsum
+}
+s1
+```
+
+
 
 #### E4: Evaluate the signal at all targets. 
 
@@ -40,6 +68,26 @@ $$s_i = \sum_{j=1}^{120} \frac{f_j }{\sqrt{(x_i-X_j)^2+(y_i-Y_j)^2}}.$$
 To do this, you should create a matrix $A$ with $A_{ij} = 1/\sqrt{(x-X_j)^2+(y-Y_j)^2}$ and then multiply by $\vec f$.  
 
 
+```{r}
+# strength vector
+f <- matrix(0, 120, 1)
+
+for(j in 1:120){
+  f[j] <- 100/sqrt(j+2)
+}
+
+# matrix A
+A <- matrix(0, 100, 120)
+
+for(i in 1:100){
+  for(j in 1:120){
+    A[i,j] <- 1/sqrt((e2x[i]-e1x[j])^2+(e2y[i]-e1y[j])^2)
+  }
+}
+
+# result
+A %*% f
+```
 
 
 
@@ -48,6 +96,15 @@ Find the best rank-one approximation of your matrix $A$ using the SVD and use it
 What is the numerical rank of your matrix? 
 
 
+```{r}
+out <- svd(A)
+U <- out$u
+sigma <- out$d
+V <- out$v
+
+aprx <- sigma[1] * (U[,1] %*% t(V[,1]))
+sigma[1]
+```
 
 
 
@@ -56,13 +113,13 @@ Find the rank-$k$ interpolative decomposition of your matrix $A$ for $k=15$ or $
 
 
 ```{r}
-#library('rsvd')
-#id <- rid(A,15)
-#C <- id$C
-#Z <- id$Z
-#print(norm(A,"F"))
-#print(norm(A - C %*% Z,"F"))
-#print(id$idx)
+library('rsvd')
+id <- rid(A, 9)
+C <- id$C
+Z <- id$Z
+print(norm(A, "F"))
+print(norm(A - C %*% Z, "F"))
+print(id$idx)
 ```
 
 
