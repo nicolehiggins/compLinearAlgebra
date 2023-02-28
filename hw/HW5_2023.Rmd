@@ -1,0 +1,209 @@
+---
+title: "HW5_S23"
+author: "Nicole Higgins"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+options(scipen = 1, digits = 16)
+```
+
+## Homework 5, due Thursday 2/23 at 5PM 
+Homework guidelines: 
+
+- The first two questions use a circular Mac logo from the [Communications page](https://www.macalester.edu/communications/tools/logodownload/):
+
+```{r}
+library(ggplot2)
+library(png)
+my.plot <- function(A){ # you're welcome to use this function! 
+  A[A>1] = 1
+  A[A<0] = 0
+  plot(1:10,1:10,type='p',col='white',asp=1)
+  rasterImage(A,1,1,10,10)
+}
+A <- readPNG("macbadge.png")[,,1]
+A <- rbind(rep(1,1160),A) # add one row of all 1's to make it square
+plot(1:10,1:10,type='p',col='white',asp=1)
+rasterImage(A,1,1,10,10)
+```
+
+### Q0: Names
+Who did you work with on this assignment? 
+
+**I worked with Jonny Xue**
+
+### Q1: Singular values of Mac logo
+Find the svd of the matrix $A$ used to plot the logo above. 
+
+```{r Q1 svd}
+out <- svd(A)
+U <- out$u
+sigma <- out$d
+V <- out$v
+```
+
+What is the largest singular value? 
+
+**the largest singular value is seen below, $928.28597...$**
+
+```{r Q1 largest sv}
+print(sigma[1])
+```
+
+What is the smallest? Are there any zero or nearly-zero singular values, and if so, how many?
+
+**assuming the cutoff for "nearly zero" is at $e-05$, there are three nearly zero singular values, as seen below within the smallest five values of $\sigma$**
+
+**this means the fourth smallest is the smallest sv, 0.000965199...**
+
+```{r Q1 five smallest svs}
+print(sigma[1156:1160])
+```
+
+ What is the dimension of the nullspace of $A$? 
+
+**since there are three nearly zero singular values, the dimension of the nullspace of A is three**
+
+
+### Q2: Legible letters in Mac logo
+Create and then plot some low-rank approximations of the Mac logo matrix $A$. About what rank is required before the words in the logo are easily legible? *This is subjective and you don't have to be exact.* How many numbers must you store in memory to save the required right and left singular vectors? (You don't need to store the singular values). What percentage of the original 1160x1160 storage is this? 
+
+```{r Q2}
+
+rank <- 25 # target rank
+
+aprx <- sigma[1] * (U[,1] %*% t(V[,1])) # rank 1 approx to initiate aprx
+
+for (i in 2:rank){
+  # add each rank up through target rank
+  aprx <- aprx + sigma[i] * (U[,i] %*% t(V[,i]))
+}
+
+dim(aprx)
+
+my.plot(aprx)
+
+```
+**the bigger font becomes legible around rank 15, though the smaller font isn't legible until around rank 25 approximation. a rank 25 approximation is $2320 * 25 = 58,000$ numbers in memory for this matrix image. since A is 1160x1160, we take $$58,000/(1.35*10^6)$$ to see that the approximation holds 4.296% of the numbers from A.** 
+
+## Q3 Salvaging a failed Cholesky factorization
+In trying to factorize a symmetric $4\times4$ matrix, I arrived here:
+$$
+A = \begin{pmatrix}
+2&0&0\\
+1&5&0\\
+-1&-1&3\\
+1&4&1
+\end{pmatrix}
+\begin{pmatrix}
+2&1&-1&1\\0&5&-1&4\\0&0&3&1
+\end{pmatrix}
++\begin{pmatrix}
+0&0&0&0\\
+0&0&0&0\\
+0&0&0&0\\
+0&0&0&-4
+\end{pmatrix}
+$$
+That is, I found three columns of $L$, but now the last entry is negative so I can't complete the Cholesky factorization. My goal was to solve $Ax = b$ with $b^T = (22,16,0,3)$. Instead of throwing out the work I've done so far, I think maybe I should try to get a factorization $A = L U$ where $U$ is not $L^T$, then solve two triangular systems. Please take over and help me find $x$! \emph{Give a solution on paper (it's OK to check by machine). Don't use complex numbers. } 
+
+```{r Q3}
+library("magick")
+q3 = image_read("HW5 Q3.png")
+print(q3)
+```
+
+
+## Q4 Sorting with permutation matrices
+Suppose we have two vectors with identical entries, but in a different order: 
+```{r}
+v <- c(3.14,2.87,16.55,23.59,62.29,90.0)
+w <- c(62.29,3.14,90.0,23.59,16.55,2.87)
+```
+We might want to find a permutation matrix $P$ such that $Pv=w$.
+One method uses the fact that both vectors are the same if you sort their entries. It relies on this version of the sorting command: 
+```{r}
+jv <- sort(v,index.return=TRUE)$ix
+print(jv)
+print(v[jv])
+```
+So *jv* is a list of integers such that *v[jv]* is the sorted list. 
+Using a permutation matrix, we can do this: 
+```{r}
+Pv <- diag(1,6,6)[jv,]
+print(Pv %*% v) # this permutation sorts v!
+```
+Of course, applying $P_v^T$ would turn the sorted array back into the original $v$. 
+
+To find $P$ so that $Pv = w$, we can set $P = P_w^TP_v$ where $P_v$ sorts $v$ and $P_w$ sorts $w$. Try it and print out $P$ and $Pv - w$ (which should be zero). 
+
+```{r Q4}
+jw <- sort(w,index.return=TRUE)$ix
+Pw <- diag(1,6,6)[jw,]
+P <- t(Pw)%*%Pv
+P
+P%*%v - w
+```
+
+
+## Q5 Half-precision numbers
+Give strings of 16 zeros and ones to represent the numbers $1/7$ and $-700.5$ in the half-precision system. 
+
+$1/7$ : **0 01100 0010010010**
+
+$-700.5$ : **1 11000 0101111001**
+
+## Q6 Avoiding overflow
+Write a function to return $sqrt(a^2+b^2)$ given $a$ and $b$ that avoids overflows and underflows and also divisions by zero. Then test it on the cases given below:
+
+```{r Q6}
+my.hypot <- function(a,b) {
+  a1 = abs(a)
+  b1 = abs(b)
+  
+  if (a1 == 0){ # cannot divide by 0
+    return(b1)
+  } 
+  if (b1 == 0){
+    return(a1)
+  }
+  if (a1 >= b1){
+    return(a1*sqrt(1 + (b1/a1)^2))
+  } else {
+    return(b1*sqrt(1 + (a1/b1)^2))
+  }
+} 
+```
+
+```{r}
+my.hypot(3, 4) # should be 5
+my.hypot(1e200, 1.5e201) # should not be Inf
+my.hypot(-1e200, -1.5e201) # should not be Inf
+my.hypot(1e-200, 1.5e-201) # should not be 0
+my.hypot(10, 0) # should be 10 
+my.hypot(0,-4) # should be 4
+```
+
+## Q7 Precision issue
+Let $x = \frac{\pi}{10^4}$. Possibly by using Taylor series, find $y = x-\log(1+x)$ to 16-digit accuracy (show all 16 digits). How many correct digits do you get with the command "y<-x-log(1+x)"?
+
+```{r Q7 find}
+x <- pi/10^4
+(x^2)/2
+(x^3)/3
+(x^4)/4
+(x^5)/5 # ignore terms after x^4/4
+```
+
+```{r Q7 answer}
+y = (x^2)/2 - (x^3)/3 + (x^4)/4
+y1 = x - log(1 + x)
+y1
+y
+```
+**we get 14 correct digits**
+

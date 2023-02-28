@@ -1,0 +1,71 @@
+---
+title: "SVD + Interpolative + Radio"
+author: "Will Mitchell"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Activity: Using SVD, Interpolative decomposition for radio signals
+
+
+#### E1: Make random sources
+Create 120 random points inside the box $[6,7]\times[4,5]$.  Make a plot showing them. 
+
+
+
+
+#### E2: Make random targets
+Create 100 random points inside the box $[0,1]\times[0,1]$.  Make a plot showing them. 
+
+
+#### E3: Evaluate the signal at one target. 
+Print out the coordinates of the first target. Call these $x_1$ and $y_1$. 
+Let the coordinates of the sources be $(X_j,Y_j)$ where $1\le j \le 120$. 
+If each source is emitting a signal of strength $f_j$, then the first target hears a combined signal of strength 
+$$s_1 = \sum_{j=1}^{120} \frac{f_j }{\sqrt{(x-X_j)^2+(y-Y_j)^2}}$$. 
+Note that the total strength will be weaker if the sources are far from the target. 
+
+Suppose that the strength of source $j$ is the number $100/\sqrt{j+2}$.  Then find the strength of the signal perceived by the first target - that is, evaluate $s_1$.  
+
+
+#### E4: Evaluate the signal at all targets. 
+
+For all $i = 1,\cdots,100$ evaluate 
+$$s_i = \sum_{j=1}^{120} \frac{f_j }{\sqrt{(x_i-X_j)^2+(y_i-Y_j)^2}}.$$
+To do this, you should create a matrix $A$ with $A_{ij} = 1/\sqrt{(x-X_j)^2+(y-Y_j)^2}$ and then multiply by $\vec f$.  
+
+
+
+
+
+#### E5 SVD approximation
+Find the best rank-one approximation of your matrix $A$ using the SVD and use it to approximate the answers to parts E3 and E4.
+What is the numerical rank of your matrix? 
+
+
+
+
+
+#### E6 Interpolative decomposition
+Find the rank-$k$ interpolative decomposition of your matrix $A$ for $k=15$ or $k=7$ or $k=4$ and use it to approximate the answers to parts E3 and E4. How do you interpret this factorization? Which 15 columns get picked? 
+
+
+```{r}
+#library('rsvd')
+#id <- rid(A,15)
+#C <- id$C
+#Z <- id$Z
+#print(norm(A,"F"))
+#print(norm(A - C %*% Z,"F"))
+#print(id$idx)
+```
+
+
+
+
+

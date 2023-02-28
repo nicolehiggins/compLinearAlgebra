@@ -9,13 +9,6 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Homework guidelines: 
-
-- Turn in this assignment as a PDF on Moodle, please! To create a PDF, I suggest knitting to HTML, then opening the HTML file in a browser and saving to PDF from there. 
-
-- You're invited to collaborate and discuss with each other, and then each person should turn in their own assignment, which should be their own work.  "Discussing" is very different from copying and I trust students to stay on the right side of this line. In general, anything you say out loud to another person is fine, and looking at a screen together (in person or on Zoom) is fine. Sharing files or screenshots is a bad idea. Name the people you work with below (question 0). 
-
-- If you start early, you're giving yourself the chance to ask questions and turn in a polished product. If you start late, you won't be able to get help as easily. 
 
 ### Q0 Collaborators
 Who did you work with on this assignment? You'll get a bonus 5 points if you name someone and they name you. *No scores above 100% are allowed, but these bonus points can repair mistakes on this assignment*.
@@ -28,14 +21,21 @@ $$B = I - \frac{1}{1+v^Tw}w v^T.$$
 In this problem your goal is to prove on paper that $B = A^{-1}$. 
 *Hint:* $B$ is the inverse of $A$ if $AB=I$. Alternately, you can let $z$ be an arbitrary vector in $\mathbb{R}^n$ and show that $ABz=z$.  This problem is a special case of a famous identity known as the Sherman-Morrison formula.  
 
+**Proof below:**
 
-
+$(I + wv^T) (I - \frac{1}{1+v^Tw}wv^T) = I\\ I +wv^T - \frac{wv^T}{1+v^Tw}-\frac{wv^T wv^T}{1+v^Tw}=I\\I + wv^T-(\frac{wv^T+wv^Twv^T}{1+v^Tw})=I\\I + wv^T - \frac{wv^T(1+v^Tw)}{1+v^Tw}=I\\I + wv^T-wv^T=I\\I=I$
 
 ### Q2: Derivative matrix
 In this problem we'll build a $7\times7$ matrix that can take derivatives. We'll let any vector $c\in\mathbb{R}^7$ represent a trigonometric polynomial of degree 3. Specifically, let
 $$f_c(x) = c_1 + c_2\cos x + c_3\sin x + c_4\cos(2x) + c_5\sin(2x) + c_6\cos(3x) + c_7\sin(3x)$$
 Let's suppose $c$ and $d$ are two vectors in $\mathbb{R}^7$, and the corresponding functions are $f_c$ and $f_d$. If the derivative of $f_c$ is $f_d$, that is, $f_c'(x) = f_d(x)$, then we can find the entries of $d$ if we know the entries of $c$. For example, if $c^T = (0,2,0,0,0,0,0)$ then we would have $d^T = (0,0,-2,0,0,0,0)$ because the derivative of $2\cos(x)$ is $-2\sin(x)$. In particular, $Ac = d$ where $A$ is a certain $7\times7$ matrix with 43 zeros. Find this matrix $A$. 
 Then show that it works by creating and describing a simple example where you find the derivative of some trig polynomial both by hand and also by multiplication with $A$.  
+
+```{r Q2}
+library("magick")
+q2 = image_read("HW4Q2.png")
+print(q2)
+```
 
 
 ### Q3: Theft
@@ -56,9 +56,10 @@ while(illAcc < 1000000){
   
   accounts = accounts*iRate # adds daily interest
   accountsTru = floor(accounts*100)/100 # truncating accounts
-  truncs = sum(accounts - accountsTru) # amount of truncation
+  truncs = sum(accounts - accountsTru) # truncations
   
   illAcc = illAcc + truncs # adding truncation
+  illAcc = illAcc*iRate # daily interest of illegal account
   accounts = accountsTru # letting accounts equal their truncated version
 }
 
@@ -170,6 +171,12 @@ Let $A = \begin{pmatrix} -1&1&-2\\2&-2&4\\4&-4&8 \end{pmatrix}$ and let $b = (5,
 
  - Show that $A$ has rank one by finding $u,v\in\mathbb{R}^3$ such that $A = uv^T$. 
  - Because rank-one matrices are not invertible, we know that the equation $Ax=b$ has either infinitely many solutions or none. If there is no $x$ with $Ax=b$, explain why not. If there are infinitely many $x$ with $Ax=b$, give two examples.
+ 
+```{r Q5}
+q5 = image_read("HW4Q5.jpg")
+print(q5)
+```
+ 
 
 ### Q6 Lion, Tiger, Pencil
 A "Word2vec" algorithm can produce vectors in $\mathbb{R}^{300}$ that correspond in some way to each English word. To do this, the algorithm trains on a massive data set containing many English-language text files, for example, news articles. These algorithms are notorious for carefully learning the prejudices of the authors of the training texts. Here is a recent and nuanced discussion of the issue, which you can explore if you like: [link](https://arxiv.org/abs/1905.09866). 
@@ -333,8 +340,26 @@ But that's subjective; it's informed by my own life experiences and priorities! 
 
 The word2vec embedding allows us to explore the distances between these words in a quantitative way, *within the flawed word2vec language model*. 
 A typical way to think about the distance between two words is from the dot product. 
+
 The Cauchy-Schwartz inequality says that $|v^Tw| < \|v\|_2 \|w\|_2$, or for nonzero vectors,  $\left|\frac{v^Tw}{\|v\|\|w\|} \right|\le 1$.  The $\le$ becomes $=$ only when $v$ is a multiple of $w$, that is, when they point in the same direction. Thus, if we compute $\frac{v^Tw}{\|v\|\|w\|}$ and get $1$, then $v$ and $w$ are very similar; if we get $-1$ then they are opposites; and if we get $0$ they are totally unrelated. Use this idea to rank the other seven words by their similarity to **tiger**. List the words and the similarity scores in a table. 
 
-*Just to ponder, not part of the problem: An alternative to this dot-product method would to say that $v$ and $w$ are close if $\frac{|v-w|_\infty}{|v|_\infty}$ is close to zero, or maybe if $\frac{|v-w|_1}{|v|_1}$ is close to zero, or maybe if $\frac{|v-w|_2}{|v|_2}$ is close to zero.*  
+```{r}
+lion %*% tiger/(norm(tiger, type="2") * norm(lion, type="2"))
+cat %*% tiger/(norm(tiger, type="2") * norm(cat, type="2"))
+horse %*% tiger/(norm(tiger, type="2") * norm(horse, type="2"))
+octopus %*% tiger/(norm(tiger, type="2") * norm(octopus, type="2"))
+snail %*% tiger/(norm(tiger, type="2") * norm(snail, type="2"))
+beetle %*% tiger/(norm(tiger, type="2") * norm(beetle, type="2"))
+pencil %*% tiger/(norm(tiger, type="2") * norm(pencil, type="2"))
+```
 
+Word | Similarity to "tiger," according to $\frac{v^Tw}{\|v\|\|w\|}$
+------------- | -------------
+cat | 0.5172961902020222
+lion | 0.5121040788731422
+beetle | 0.3287175047393056
+horse | 0.2876559461603138
+octopus | 0.2439948086041927 
+snail | 0.2244429287752359
+pencil | 0.1348347049613083
 
