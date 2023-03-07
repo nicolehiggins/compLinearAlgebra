@@ -1,0 +1,66 @@
+---
+title: "HW6 on cereals"
+author: "nicole higgins"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+### SVD and breakfast cereals
+
+The SVD can be used to take a two-dimensional or three-dimensional snapshot of high-dimensional data, so that dimensionally-challenged human beings can see it. In this assignment, you will use the top two singular values to project some data down to 2-dimensional space where you can interpret it.
+
+Here is a data set on cereals:
+
+```{r}
+cereal = read.csv("cereal.csv")
+A =  as.matrix(cereal[,4:16])
+Names = as.matrix(cereal[,1])
+```
+
+The matrix $A$ has nutritional information (in 13 categories) about 77 breakfast cereals (one per row of $A$).  The names of the cereals are stored as the vector "Names".  This dataset is from Kaggle.  
+
+The columns are measured in differing units, so we'll do some preprocessing before we take the SVD. 
+
+## Q1 Preprocessing and SVD
+Within each column of $A$, subtract off the mean. Then, within each column of $A$, divide by the square root of the variance, like "c <- c / sqrt(var(c))" if c were a column of $A$. Plot the singular values of the modified matrix $A$. Comment on the plot. 
+
+```{r Q1 processing}
+for (i in 1:13){
+  colMean <- sum(A[,i])/77
+  colSqVar <- sqrt(var(A[,i]))
+  for (j in 1:77){
+    A[j,i] <- (A[j,i] - colMean)/colSqVar
+  }
+}
+```
+
+```{r Q1 svd}
+out <- svd(A)
+sigma <- out$d
+
+plot(sigma)
+```
+
+**the first two, maybe three, sv's are larger than the remaining ten. this means that they represent a good chunk of the data.**
+
+## Q2 2D plot for high-dimensional cereal vectors
+Use the vectors $x = U_1$ and $y = U_2$ from the SVD as the $x$ and $y$ coordinates of points in the plane. Plot these points. Label the $i^{th}$ point with the $i^{th}$ brand of cereal. To do this, you can use the following command after your plotting command:
+```
+text(x,y,Names,cex=0.3) # the cex= makes the text smaller
+```
+
+## Q3 Outliers
+Do any of the cereals look like outliers to you? 
+
+## Q4 Similar names
+The two cereals "All-Bran" and "100% Bran" have very similar names. Do they appear close together on the plot? 
+
+## Q5 Gift for friend
+Suppose that I have never eaten any of these cereals but I have a friend who really likes "Great Grains Pecan." I want to bring some to them as a surprise gift. Unfortunately, the store has run out of this cereal and I have to choose something similar instead. As a second choice, which cereal might make a good gift for my friend? 
+
+## Q6 Interpreting $U_1$
+Which cereals have the most extreme positions in the $U_1$-direction? If you look at those rows in the original matrix, do you notice anything special about their values? Can you find an interpretation of the right/left direction in your plot? 
+
