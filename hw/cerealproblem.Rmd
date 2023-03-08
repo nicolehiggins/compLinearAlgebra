@@ -44,7 +44,7 @@ sigma <- out$d
 plot(sigma)
 ```
 
-**the first two, maybe three, sv's are larger than the remaining ten. this means that they represent a good chunk of the data.**
+**the first two, maybe three, sv's are larger than the remaining ten. this means that they alone represent a good chunk of the data.**
 
 ## Q2 2D plot for high-dimensional cereal vectors
 Use the vectors $x = U_1$ and $y = U_2$ from the SVD as the $x$ and $y$ coordinates of points in the plane. Plot these points. Label the $i^{th}$ point with the $i^{th}$ brand of cereal. To do this, you can use the following command after your plotting command:
@@ -52,15 +52,33 @@ Use the vectors $x = U_1$ and $y = U_2$ from the SVD as the $x$ and $y$ coordina
 text(x,y,Names,cex=0.3) # the cex= makes the text smaller
 ```
 
+```{r Q2}
+# setting values
+xCords <- out$u[,1]
+yCords <- out$u[,2]
+
+plot(xCords, yCords) # plotting coordinates
+text(xCords, yCords+.02, Names, cex=0.3) # the cex= makes the text smaller
+```
+
+
 ## Q3 Outliers
 Do any of the cereals look like outliers to you? 
+
+**yes, 'Bran with Extra Fiber' is the most obvious outlier, followed by '100% Bran' and 'All-Bran'. some of the lowermost points appear to be outliers too, including 'Puffed Rice', 'Puffed Wheat', and 'Shredded Wheat'**
 
 ## Q4 Similar names
 The two cereals "All-Bran" and "100% Bran" have very similar names. Do they appear close together on the plot? 
 
+**yes they do, near (-0.3, 0.1)**
+
 ## Q5 Gift for friend
 Suppose that I have never eaten any of these cereals but I have a friend who really likes "Great Grains Pecan." I want to bring some to them as a surprise gift. Unfortunately, the store has run out of this cereal and I have to choose something similar instead. As a second choice, which cereal might make a good gift for my friend? 
 
+**the cereal closest to 'Great Grains Pecan' on the graph is 'Raisin Nut Bran', so that would be a good second choice**
+
 ## Q6 Interpreting $U_1$
 Which cereals have the most extreme positions in the $U_1$-direction? If you look at those rows in the original matrix, do you notice anything special about their values? Can you find an interpretation of the right/left direction in your plot? 
+
+**the U_1 direction seems to well-describe a cereal's fiber content, with the left being the most fiber, and the right being the least. while this axis isn't exactly equal to the fiber values, it gives a good sense of it in terms of order and rank.**
 
