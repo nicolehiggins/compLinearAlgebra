@@ -1,0 +1,136 @@
+---
+title: "Givens + Householder Activity"
+author: "Nicole Higgins"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## $A = QR$ by Givens rotations
+
+```{r}
+# Plan: staring with square A, repeatedly apply Givens rotations:
+#             GGGGGGGGA = R 
+# (put in zeros until we get a upper-triangular product)
+# then, A = QR with Q = (GGGGGGG)^T
+A <- matrix(runif(25),5,5)
+A.original <- A + 0
+
+n <- dim(A)[1]
+
+Q <- diag(1,n,n)
+for (co in 1:(n-1)){
+  for (ro in n:(co+1)){
+    # put in a zero at position (ro,co) 
+    # and dump the extra mass into the diagonal entry (co,co) 
+    
+    a <- A[co,co]
+    b <- A[ro,co]
+    r <- sqrt(a^2+b^2)
+    c <- a/r
+    s <- -b/r
+    G <- diag(1,n,n)
+    G[co,co] <- c
+    G[ro,ro] <- c
+    G[ro,co] <- -s
+    G[co,ro] <- s
+    A <- G %*% A
+    Q <- Q %*% t(G)
+        
+    
+  }
+}
+R <- A
+
+print(max(abs(A.original - Q %*% R  )))
+
+```
+
+
+
+## $A = QR$ by Householder Reflections
+This is how R's built-in QR factorization method works! 
+
+```{r}
+# Plan: multiply A by Householder reflections H until HHHHHHHHHH A = R is upper triangular
+# then A = (H^TH^TH^TH^TH^TH^TH^TH^T) R
+# or A = Q R
+
+# assume A is square
+
+A <- matrix(runif(25),5,5)
+A.original <- A + 0 
+n <- dim(A)[1]
+Q <- diag(1,n,n)
+
+for (co in 1:(n-1)){
+  # put 0s below the diagonal in column "co" of A
+  x <- A[,co] # column co of A
+  w <- x + 0
+  w[(co+1):n] <- 0
+  w[co] <- sqrt(sum(x[co:n]^2))
+  
+  #reflector
+  v <- (x - w)
+  nv <- sqrt(sum(v^2))
+  v <- v/nv
+  H <- diag(1,n,n) - 2 * v %*% t(v)
+  
+  #reflecting
+  A <- H %*% A
+  Q <- Q %*% t(H)
+}
+
+R <- A
+
+print(R)
+print(max(abs(A.original - Q %*% R)))
+print(max(abs(diag(1,n,n) - t(Q) %*% Q)))
+```
+
+
+## $A = U\Sigma V^T$ by Givens rotations
+In this context, the Givens rotations are called Jacobi rotations :) 
+
+
+#### A long warmup question
+Previously we used Givens rotations to put zeros into vectors or matrices. Now we'll use them for another purpose: making two vectors perpendicular. 
+
+Suppose that $A$ is a $2\times n$ matrix with rows $A_1^T$ and $A_2^T$.  If we make $GA=N$ where $G$ is the Givens rotation $G=\begin{pmatrix}c&-s\\s&c\end{pmatrix}$, then the new rows will be $N_1^T = cA_1^T-sA_2^T$ and $N_2^T = sA_1^T + cA_2^T$. Can you find a way to pick $s$ and $c$ so that $0 = N_1^T N_2 = sc (A_1^TA_1 - A_2^TA_2) +(c^2-s^2)A_1^TA_2$?
+
+Solution: use $\cos(2t) = \cos^2(t) - \sin^2(t)$ and $\sin(2t) =2 \sin(t)\cos(t)$ to get
+$$\cos(2t) A_1^TA_2 = \frac12 \sin(2t)(A_2^TA_2-A_1^TA_1) $$ 
+If $A_1^TA_2=0$ we can take $t=0$: the rows were already perpendicular and we don't to rotate.
+If $A_2^TA_2-A_1^TA_1=0$ then we can take $t = \pi/4$. 
+Otherwise, we can divide to get 
+$$ 
+\tan(2t) = \frac{2A_1^TA_2}{A_2^TA_2-A_1^TA_1}
+$$
+But now we can use the formula $\tan(2t) = 2\tan t / (1-\tan^2 t)$ to get 
+$$
+\tan t = (1-\tan^2 t)\frac{A_1^TA_2}{A_2^TA_2-A_1^TA_1}
+$$
+With $\beta = \frac{A_2^TA_2-A_1^TA_1}{2A_1^TA_2}$, this becomes the quadratic: 
+$$
+\tan^2 t + 2\beta\tan t - 1 = 0
+$$
+The solutions of the quadratic are
+$$
+\tan t =  {-\beta} \pm \sqrt{\beta^2+1}
+$$
+To avoid subtracting nearly equal quantities, we pick one:
+$$
+\tan t =  -\sgn(\beta)\left(|\beta|- \sqrt{\beta^2+1}\right) =  -\sgn(\beta)\frac{-1}{|\beta|+ \sqrt{\beta^2+1}} = \frac{\sgn(\beta)}{|\beta|+ \sqrt{\beta^2+1}}
+$$
+Finally, get $c = 1/\sqrt{\tan(t)^2 + 1}$ and $s = \tan(t) c$.
+
+#### SVD by left Jacobi
+Multiply $GGGGGGA$ until the rows of $A$ are orthogonal, but not unit length. Then let $\sigma_i $ be the $2$-norm of row $i$. Then $GGGGGGA = \Sigma V^T$ and $A = (GGGGGG)^T \Sigma V^T$. 
+
+
+
+

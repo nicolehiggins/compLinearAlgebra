@@ -1,0 +1,45 @@
+---
+title: "markov chain"
+author: "Nicole"
+date: "2023-04-13"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+```{r}
+M = matrix(c(0.55, 0.4, 0.05, 0.1, 0.8, 0.1, 0.1, 0.2, 0.7), 3, 3)
+M
+initPop = c(110, 90, 100)
+
+newPop = M %*% initPop
+
+for(i in 1:999){
+  newPop = M %*% newPop
+}
+
+newPop
+sum(newPop)
+```
+
+```{r}
+newPop/300
+
+```
+
+```{r}
+# way to compute dominant eigenvalue
+
+(A %*% y) / y
+
+```
+
+Rayleigh quotient
+
+v^T A v / v^T v = $\lambda$
+
+

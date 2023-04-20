@@ -1,0 +1,102 @@
+---
+title: "Krylov solvers activity"
+author: "Will Mitchell"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+###
+
+```{r}
+require(Rlinsolve)
+require(Matrix)
+```
+
+### Pre-reading
+Look over the Krylov method notes here: [link](https://drive.google.com/file/d/1HnHYRj4EyEiDO3R0ary6ntPHwibw1ktx/view?usp=sharing). Have you heard of some of these methods before? 
+
+### So many linear solvers! 
+Look at the index for the Rlinsolve package here:
+[link](https://search.r-project.org/CRAN/refmans/Rlinsolve/html/00Index.html). 
+Which ones have we mentioned in class or in the Krylov notes? Click on three of the links. Are the help files consistent with what you already know about the method? What questions do you have about what you find? 
+
+
+
+
+### Mystery matrix
+Here's a matrix $A$:
+```{r}
+A <- aux.fisch(10)
+```
+What are its dimensions? Is it symmetric? How many nonzero entries does it have? Make a plot of its eigenvalues in the complex plane using the Re and Im commands. Which iterative solvers would be good choices for this $A$? 
+
+### CG example
+Create a $3\times 3$ positive-definite system and solve it with the CG method ```lsolve.cg```. 
+
+### GMRES example
+Create a $3\times 3$ system without any special structure and solve it with the GMRES method ```lsolve.gmres``` OR CG2 OR Bicg-STAB. 
+
+### CG picture
+The CG method is based on the idea of finding the $x$ that minimizes $f(x) = 0.5 x^TAx - x^Tb$. With the system 
+$$A = \begin{pmatrix}3&1\\1&3\end{pmatrix},\qquad b = \begin{pmatrix}1\\1\end{pmatrix},$$ write $\vec x = (u,v)^T$ and write $f(x)=f(u,v)$ as a quadratic function of $u$ and $v$. Then adapt the code below to make a contour plot of $f$ in the $u,v$ plane. You should see some ovals that shrink to the true solution of the system, which is $x=0.25,0.25$.  
+
+
+```{r}
+# contour plot demo
+u <- seq(-1,1,length=200)
+v <- seq(-1,1,length=200)
+U <- outer(u,0*v,"+")
+V <- outer(u*0,v,"+")
+Z <- U - 2*V # modify this line creating Z from U and V!
+contour(u,v,Z,asp=1)
+```
+
+### Preconditioning
+Let's revisit this matrix again:
+```{r}
+A <- aux.fisch(10)
+```
+Let $P$ be the diagonal matrix with $P_{ii} = A_{ii}$, so $P$ is easy to invert but in some way imitates the behavior of $A$.  
+Our intuition is that $P^{-1}A\approx I$. Since the eigenvalues of $I$ are all 1, we hope that the eigenvalues of $P^{-1}A$ will be approximately 1. Create the matrix $P^{-1}A$ and plot its eigenvalues in the complex plane. Are they more clustered / clumped? Is the solution of $P^{-1}A x = P^{-1}b$ the same as the solution of $Ax=b$? Besides the diagonal, can you think of another way to find a $P\approx A$ with easy $P^{-1}$? 
+
+
+
+### CG solver
+Here is a code for the CG method without preconditioning. Compare to the pseudocode in the notes and comment on what you see. 
+```{r}
+# Conjugate Gradient Method
+# Inputs: symm pos def matrix A, rhs b, number of steps n, 
+# x is the initial guess, 
+# tol is a stopping condition on the size of the residual
+# history gives a full history
+# Output: solution x to Ax=b 
+ConjGrad <- function(A,b,x = rep(0,length(b)),tol=1e-18,m = length(b),history=FALSE) {
+  n <- length(b)
+  r <- b - A %*% x
+  d <- r
+  if (history) {
+    hist <- matrix(NA,nrow=n,ncol=m+1)
+    hist[,1] <- x
+  }
+  for (i in 1:m ) {
+    if (max(abs(r)) < tol) break
+    steps <- i
+    alpha <- (t(r) %*% r)/(t(d) %*% A %*% d)  # step length
+    x <- x + alpha[1,1] * d                  # take step 
+    if (history) {hist[,i+1] <- x[,1]}
+    rold <- r
+    r <- rold - alpha[1,1] * A %*% d         # new residual
+    beta <- (t(r) %*% r)/(t(rold) %*% rold)   # improvement this step
+    d <- r + beta[1,1]*d
+  }
+  if (history) {return(list(x=x,history=hist))}
+  else {return(list(x=x,steps=steps))}
+}
+```
+
+
+

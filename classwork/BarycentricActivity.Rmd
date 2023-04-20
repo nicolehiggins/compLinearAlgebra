@@ -51,3 +51,25 @@ y <- moon.data[,2]
 plot(x,y,asp=1)
 ```
 
+```{r}
+weights <- matrix(0,1,15)
+
+for (j in 1:15){
+  if (j == 1 | j == 15){
+    weights[j] <- (-1)^(j+1)/2
+  } else {
+    weights[j] <- (-1)^(j+1)
+  }
+}
+
+weights
+```
+
+```{r}
+xVals <- seq(0,25,0.001)
+
+
+```
+
+
+
