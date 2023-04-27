@@ -25,17 +25,49 @@ Look at the index for the Rlinsolve package here:
 Which ones have we mentioned in class or in the Krylov notes? Click on three of the links. Are the help files consistent with what you already know about the method? What questions do you have about what you find? 
 
 
-
-
 ### Mystery matrix
 Here's a matrix $A$:
 ```{r}
+options(max.print = 100000)
+
 A <- aux.fisch(10)
+
+dim(A)
+A == t(A)
+
+max(A-t(A))
+
+sum(A == 0)
 ```
-What are its dimensions? Is it symmetric? How many nonzero entries does it have? Make a plot of its eigenvalues in the complex plane using the Re and Im commands. Which iterative solvers would be good choices for this $A$? 
+What are its dimensions? Is it symmetric? How many nonzero entries does it have? 
+
+**its dimensions are 100 x 100**
+**it is symmetric**
+**it has 460 nonzero entries**
+
+Make a plot of its eigenvalues in the complex plane using the Re and Im commands. Which iterative solvers would be good choices for this $A$? 
+
+```{r}
+vals = eigen(A)$values
+
+plot(1:100, vals)
+
+plot(1:100, Re(vals)+Im(vals))
+```
+
 
 ### CG example
 Create a $3\times 3$ positive-definite system and solve it with the CG method ```lsolve.cg```. 
+
+```{r}
+B <- matrix(c(5,3,20,83,2,0,2,58,2),3,3)
+b <- c(5,2,4)
+
+lsolve.cg(B, b)
+
+
+```
+
 
 ### GMRES example
 Create a $3\times 3$ system without any special structure and solve it with the GMRES method ```lsolve.gmres``` OR CG2 OR Bicg-STAB. 
